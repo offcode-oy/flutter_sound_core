@@ -87,6 +87,13 @@
 
         -(bool)  play
         {
+                // This fixes the audio output to the speaker (LAPSI fix)
+                NSError *error = nil;
+                [[AVAudioSession sharedInstance]
+                setCategory:AVAudioSessionCategoryPlayAndRecord
+                withOptions: AVAudioSessionCategoryOptionAllowBluetoothA2DP | AVAudioSessionCategoryOptionAllowBluetooth
+                error:&error];
+                
                 bool b = [ [self getAudioPlayer] play];
                 return b;
         }
@@ -301,10 +308,16 @@
                 if (ready < NB_BUFFERS )
                 {
                         int ln = (int)[data length];
-                        int frameLn = ln/2;
-                        int frameLength =  8*frameLn;// Two octets for a frame (Monophony, INT Linear 16)
+                        int frameLn = ln/4;
+                        int frameLength =  frameLn;// Two octets for a frame (Monophony, INT Linear 16)
 
-                        playerFormat = [[AVAudioFormat alloc] initWithCommonFormat: AVAudioPCMFormatInt16 sampleRate: (double)m_sampleRate channels: m_numChannels interleaved: NO];
+                        AVAudioChannelLayout *chLayout = [[AVAudioChannelLayout alloc] initWithLayoutTag:kAudioChannelLayoutTag_Stereo];
+                        playerFormat = [[AVAudioFormat alloc] 
+                                initWithCommonFormat: AVAudioPCMFormatInt16
+                                sampleRate: (double)m_sampleRate
+                                // channels: m_numChannels
+                                interleaved: YES
+                                channelLayout: chLayout];
 
                         AVAudioPCMBuffer* thePCMInputBuffer =  [[AVAudioPCMBuffer alloc] initWithPCMFormat: playerFormat frameCapacity: frameLn];
                         memcpy((unsigned char*)(thePCMInputBuffer.int16ChannelData[0]), [data bytes], ln);
