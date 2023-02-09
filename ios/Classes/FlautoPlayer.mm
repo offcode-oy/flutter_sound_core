@@ -63,7 +63,7 @@ static bool _isIosDecoderSupported [] =
         long latentSeek;
         bool voiceProcessing;
         NSDictionary* equalizerParams;
-
+        bool loudspeakerIsOn;
 }
 
 - (FlautoPlayer*)init: (NSObject<FlautoPlayerCallback>*) callback
@@ -85,6 +85,11 @@ static bool _isIosDecoderSupported [] =
 - (bool)isVoiceProcessingEnabled
 {
         return voiceProcessing;
+}
+
+-(bool)isLoudSpeakerOn
+{
+    return loudspeakerIsOn;
 }
 
 
@@ -186,7 +191,7 @@ static bool _isIosDecoderSupported [] =
         [self stop]; // To start a fresh new playback
 
         if ( (path == nil ||  [path class] == [NSNull class] ) && codec == pcm16)
-                m_playerEngine = [[AudioEngine alloc] init: self eqParams: equalizerParams ];
+                m_playerEngine = [[AudioEngine alloc] init: self eqParams: equalizerParams loudSpeakerOn: loudspeakerIsOn ];
         else
                 m_playerEngine = [[AudioPlayerFlauto alloc]init: self];
         
@@ -473,7 +478,7 @@ static bool _isIosDecoderSupported [] =
 
 - (long)getDuration
 {
-         return [m_playerEngine getDuration];
+    return [m_playerEngine getDuration];
 }
 
 - (void)initEqualizer:(NSDictionary*) params
@@ -489,6 +494,12 @@ static bool _isIosDecoderSupported [] =
 - (void) setEqualizerBandGain: (int) bandIndex gain: (float) gain
 {
     [m_playerEngine setEqualizerBandGain: bandIndex gain: gain];
+}
+
+- (void) setLoudSpeakerOn: (bool) isLoudSpeaker
+{
+    loudspeakerIsOn = (bool)isLoudSpeaker;
+//    [m_playerEngine loudSpeakerOn: isLoudSpeaker];
 }
 
 

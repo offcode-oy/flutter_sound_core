@@ -83,13 +83,38 @@
 
         -(bool)  play
         {
-            // This fixes the audio output to the speaker (LAPSI fix)
-            NSError *error = nil;
-            [[AVAudioSession sharedInstance]
-            setCategory: AVAudioSessionCategoryPlayAndRecord
-            mode: AVAudioSessionModeDefault
-            options: AVAudioSessionCategoryOptionAllowBluetoothA2DP | AVAudioSessionCategoryOptionAllowBluetooth
-            error:&error];
+//            // This fixes the audio output to the speaker (LAPSI fix)
+//            bool success;
+//            NSError *error = nil;
+//
+//            AVAudioSession * session = [AVAudioSession sharedInstance];
+//
+//            bool isLoudSpeakerOn = [flautoPlayer isLoudSpeakerOn];
+//            NSLog(@"Is loudspeaker on: %s", isLoudSpeakerOn ? "YES":"NO");
+//
+//            if (isLoudSpeakerOn){
+//                success = [session
+//                   setCategory: AVAudioSessionCategoryPlayAndRecord
+//                   mode: AVAudioSessionModeDefault
+//                   options: AVAudioSessionCategoryOptionDefaultToSpeaker
+//                   error:&error
+//                ];
+//                if(!success) NSLog(@"Error during session category set (init SPEAKER) %@", error);
+//
+//                // Override to speaker
+//                success = false;
+//                success = [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
+//                if(!success) NSLog(@"Error override (SPEAKER): %@", error);
+//            } else {
+//                //Bluetooth
+//                success = [session
+//                    setCategory: AVAudioSessionCategoryPlayAndRecord
+//                    mode: AVAudioSessionModeDefault
+//                    options: AVAudioSessionCategoryOptionAllowBluetoothA2DP | AVAudioSessionCategoryOptionAllowBluetooth
+//                    error:&error
+//                ];
+//                if(!success) NSLog(@"Error during session category set (init BT) %@", error);
+//            }
                 
             bool b = [ [self getAudioPlayer] play];
             return b;
@@ -147,6 +172,20 @@
                 return -1;
         }
 
+        - (void)enableEqualizer:(bool)enabled {
+            NSLog(@"enableEqualizer not implemented (AudioPlayerFlauto)");
+        }
+
+
+        - (void)loudSpeakerOn:(bool)isLoudSpeaker {
+            NSLog(@"loudSpeakerOn not implemented (AudioPlayerFlauto)");
+        }
+
+
+        - (void)setEqualizerBandGain:(int)bandIndex gain:(float)gain {
+            NSLog(@"setEqualizerBandGain not implemented (AudioPlayerFlauto)");
+        }
+
 @end
 
 
@@ -171,13 +210,16 @@
         int  m_numChannels;
 }
 
-       - (AudioEngine*)init: (FlautoPlayer*)owner eqParams: (NSDictionary*) params
+       - (AudioEngine*)init: (FlautoPlayer*)owner eqParams: (NSDictionary*) params loudSpeakerOn: (bool) loudSpeakerOn
        {
             flutterSoundPlayer = owner;
             waitingBlock = nil;
             engine = [[AVAudioEngine alloc] init];
             outputNode = [engine outputNode];
             playerNode = [[AVAudioPlayerNode alloc] init];
+            
+           // init speaker configs
+//           [self loudSpeakerOn:loudSpeakerOn];
            
             if (@available(iOS 13.0, *)) {
                 if ([flutterSoundPlayer isVoiceProcessingEnabled]) {
@@ -281,7 +323,7 @@
            }
        }
 
-       - (AVAudioUnitEQ *) setEqualizer:(NSDictionary*) arguments; {
+       - (AVAudioUnitEQ *) setEqualizer:(NSDictionary*) arguments {
            [flutterSoundPlayer logDebug:@"Initialize darwin EQ!"];
            
            AVAudioUnitEQ* _eq;
@@ -390,6 +432,7 @@
 
         -(bool) play
         {
+            [self loudSpeakerOn:true];
             [playerNode play];
             return true;
 
@@ -510,6 +553,82 @@
                 return true; // TODO
         }
 
+        - (void) loudSpeakerOn:(bool) isLoudSpeaker
+        {
+            
+            // This fixes the audio output to the speaker (LAPSI fix)
+            bool success;
+            NSError *error = nil;
+
+            AVAudioSession * session = [AVAudioSession sharedInstance];
+//            [session setActive:NO error:nil];
+            
+            bool isLoudSpeakerOn = [flutterSoundPlayer isLoudSpeakerOn];
+            NSLog(@"Is loudspeaker on: %s", isLoudSpeakerOn ? "YES":"NO");
+            
+            if (isLoudSpeakerOn){
+                success = [session
+                   setCategory: AVAudioSessionCategoryPlayAndRecord
+                   mode: AVAudioSessionModeDefault
+                   options: AVAudioSessionCategoryOptionDefaultToSpeaker
+                   error:&error
+                ];
+                if(!success) NSLog(@"Error during session category set (init SPEAKER) %@", error);
+                
+                // Override to speaker
+                success = false;
+                success = [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
+                if(!success) NSLog(@"Error override (SPEAKER): %@", error);
+            } else {
+                //Bluetooth
+                success = [session
+                    setCategory: AVAudioSessionCategoryPlayAndRecord
+                    mode: AVAudioSessionModeDefault
+                    options: AVAudioSessionCategoryOptionAllowBluetoothA2DP | AVAudioSessionCategoryOptionAllowBluetooth
+                    error:&error
+                ];
+//                success = [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error];
+                if(!success) NSLog(@"Error during session category set (init BT) %@", error);
+            }
+//            [session setActive:YES error:nil];
+            
+//            NSLog(@"loudSpeakerOn: %s", isLoudSpeaker ? "TRUE": "FALSE");
+//
+//            AVAudioSession * session = [AVAudioSession sharedInstance];
+//
+//            [session setActive:NO error:nil];
+//
+//            BOOL success;
+//            NSError* error;
+//
+//            if (isLoudSpeaker){
+//                //Speaker
+//                success = [session
+//                    setCategory: AVAudioSessionCategoryPlayAndRecord
+//                    mode: AVAudioSessionModeDefault
+//                    options: AVAudioSessionCategoryOptionDefaultToSpeaker
+//                    error:&error
+//                ];
+//            } else {
+//                //Bluetooth
+//                success = [session
+//                    setCategory: AVAudioSessionCategoryPlayAndRecord
+//                    mode: AVAudioSessionModeDefault
+//                    options: AVAudioSessionCategoryOptionAllowBluetoothA2DP | AVAudioSessionCategoryOptionAllowBluetooth
+//                    error:&error
+//                ];
+//            }
+//            if(!success) NSLog(@"AVAudioSession error setting category:%@",error);
+//
+//            //Override audio port
+//            success = [session overrideOutputAudioPort : isLoudSpeaker ?
+//                     AVAudioSessionPortOverrideSpeaker : AVAudioSessionPortOverrideNone
+//                                                  error: & error];
+//
+//            if(!success) NSLog(@"AVAudioSession error setting :%@",error);
+//
+//            [session setActive:YES error:nil];
+        }
 
         - (float) gainFrom:(float) value
         {
@@ -532,7 +651,7 @@
         AVAudioFormat* outputFormat;
         AVAudioOutputNode* outputNode;
         CFTimeInterval mStartPauseTime ; // The time when playback was paused
-	CFTimeInterval systemTime ; //The time when  StartPlayer() ;
+        CFTimeInterval systemTime ; //The time when  StartPlayer() ;
         double mPauseTime ; // The number of seconds during the total Pause mode
         NSData* waitingBlock;
         long m_sampleRate ;
@@ -654,6 +773,11 @@
 - (void)setEqualizerBandGain:(int)bandIndex gain:(float)gain {
     NSLog(@"setEqualizerBandGain not implemented (MIC)");
 }
+
+- (void)loudSpeakerOn:(bool)isLoudSpeaker {
+    NSLog(@"loudSpeakerOn not implemented (MIC)");
+}
+
 
 
 

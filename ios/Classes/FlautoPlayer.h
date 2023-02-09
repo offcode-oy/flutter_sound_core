@@ -59,6 +59,7 @@
            
 - (void)setVoiceProcessing: (bool) enabled;
 - (bool)isVoiceProcessingEnabled;
+- (bool)isLoudSpeakerOn;
 - (t_PLAYER_STATE)getPlayerState;
 - (bool)isDecoderSupported: (t_CODEC)codec ;
 - (void)releaseFlautoPlayer;
@@ -87,10 +88,8 @@
 - (void)logDebug: (NSString*)msg;
 - (void)initEqualizer:(NSDictionary*) params;
 - (void)enableEqualizer:(bool)enable;
-- (void) setEqualizerBandGain: (int) bandIndex gain: (float) gain;
-
-
-
+- (void)setEqualizerBandGain: (int) bandIndex gain: (float) gain;
+- (void)setLoudSpeakerOn:(bool)isLoudSpeaker;
 
 @end
 

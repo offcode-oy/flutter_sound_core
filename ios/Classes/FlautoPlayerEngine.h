@@ -50,6 +50,7 @@
     - (int) feed: (NSData*)data;
     - (void) enableEqualizer:(bool) enabled;
     - (void) setEqualizerBandGain: (int) bandIndex gain: (float) gain;
+    - (void) loudSpeakerOn:(bool) isLoudSpeaker;
 
 @end
 
@@ -72,6 +73,7 @@
     - (void) setAudioPlayer: (AVAudioPlayer*)thePlayer;
     - (int) feed: (NSData*)data;
     - (AVAudioUnitEQ *) setEqualizer:(NSDictionary*) arguments;
+    - (void) loudSpeakerOn:(bool) isLoudSpeaker;
 
 @end
 
@@ -80,7 +82,8 @@
 {
         // TODO FlutterSoundPlayer* flutterSoundPlayer; // Owner
 }
-    - (AudioEngine*)init: (NSObject*)owner eqParams: (NSDictionary*) params;
+//    - (AudioEngine*)init: (NSObject*)owner eqParams: (NSDictionary*) params;
+    - (AudioEngine*)init: (NSObject*)owner eqParams: (NSDictionary*) params loudSpeakerOn: (bool) loudSpeakerOn;
 
     - (void) startPlayerFromBuffer:  (NSData*)data ;
     - (void) startPlayerFromURL: (NSURL*) url codec: (t_CODEC)codec channels: (int)numChannels sampleRate: (long)sampleRate ;
@@ -117,52 +120,6 @@
     - (int) feed: (NSData*)data;
 
 @end
-
-//#pragma mark - Enum EffectType
-//typedef NS_ENUM(NSUInteger, EffectType) {
-//        EffectTypeDarwinEqualizer, NotImplemented
-//    };
-//
-//NSString *NSStringFromEffectType(EffectType type) {
-//    switch (type) {
-//        case EffectTypeDarwinEqualizer:
-//            return @"DarwinEqualizer";
-//        default:
-//            return @"";
-//    }
-//}
-//EffectType EffectTypeFromNSString(NSString *string) {
-//    if ([string isEqualToString:@"DarwinEqualizer"]) {
-//        return EffectTypeDarwinEqualizer;
-//    }
-//    return NotImplemented;
-//}
-//
-//#pragma mark - Protocol EffectData
-//@protocol EffectData <NSObject>
-//    @property (nonatomic, assign, readonly) EffectType type;
-//@end
-//
-//#pragma mark - Struct BandEqualizerData
-//@interface BandEqualizerData : NSObject <NSCoding, NSSecureCoding>
-//    @property (nonatomic, assign) NSUInteger index;
-//    @property (nonatomic, assign) float centerFrequency;
-//    @property (nonatomic, assign) float gain;
-//@end
-//
-//#pragma mark - Struct ParamsEqualizerData
-//@interface ParamsEqualizerData : NSObject <NSCoding, NSSecureCoding>
-//    @property (nonatomic, strong) NSArray<BandEqualizerData *> *bands;
-//@end
-//
-//#pragma mark - Struct EqualizerEffectData
-//@interface EqualizerEffectData : NSObject <EffectData>
-//    @property (nonatomic, assign) EffectType type;
-//    @property (nonatomic, assign) BOOL enabled;
-//    @property (nonatomic, strong) ParamsEqualizerData *parameters;
-//    - (instancetype)fromJson:(NSDictionary *)map;
-//    - (id<EffectData>)effectFrom:(NSDictionary *)map error:(NSError **)error;
-//@end
 
 
 #endif /* PlayerEngine_h */
