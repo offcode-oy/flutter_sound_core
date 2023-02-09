@@ -50,7 +50,6 @@
     - (int) feed: (NSData*)data;
     - (void) enableEqualizer:(bool) enabled;
     - (void) setEqualizerBandGain: (int) bandIndex gain: (float) gain;
-    - (void) loudSpeakerOn:(bool) isLoudSpeaker;
 
 @end
 
@@ -73,7 +72,7 @@
     - (void) setAudioPlayer: (AVAudioPlayer*)thePlayer;
     - (int) feed: (NSData*)data;
     - (AVAudioUnitEQ *) setEqualizer:(NSDictionary*) arguments;
-    - (void) loudSpeakerOn:(bool) isLoudSpeaker;
+    - (void) loudSpeakerOn;
 
 @end
 
@@ -83,7 +82,7 @@
         // TODO FlutterSoundPlayer* flutterSoundPlayer; // Owner
 }
 //    - (AudioEngine*)init: (NSObject*)owner eqParams: (NSDictionary*) params;
-    - (AudioEngine*)init: (NSObject*)owner eqParams: (NSDictionary*) params loudSpeakerOn: (bool) loudSpeakerOn;
+    - (AudioEngine*)init: (NSObject*)owner eqParams: (NSDictionary*) params;
 
     - (void) startPlayerFromBuffer:  (NSData*)data ;
     - (void) startPlayerFromURL: (NSURL*) url codec: (t_CODEC)codec channels: (int)numChannels sampleRate: (long)sampleRate ;

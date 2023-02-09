@@ -83,39 +83,6 @@
 
         -(bool)  play
         {
-//            // This fixes the audio output to the speaker (LAPSI fix)
-//            bool success;
-//            NSError *error = nil;
-//
-//            AVAudioSession * session = [AVAudioSession sharedInstance];
-//
-//            bool isLoudSpeakerOn = [flautoPlayer isLoudSpeakerOn];
-//            NSLog(@"Is loudspeaker on: %s", isLoudSpeakerOn ? "YES":"NO");
-//
-//            if (isLoudSpeakerOn){
-//                success = [session
-//                   setCategory: AVAudioSessionCategoryPlayAndRecord
-//                   mode: AVAudioSessionModeDefault
-//                   options: AVAudioSessionCategoryOptionDefaultToSpeaker
-//                   error:&error
-//                ];
-//                if(!success) NSLog(@"Error during session category set (init SPEAKER) %@", error);
-//
-//                // Override to speaker
-//                success = false;
-//                success = [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
-//                if(!success) NSLog(@"Error override (SPEAKER): %@", error);
-//            } else {
-//                //Bluetooth
-//                success = [session
-//                    setCategory: AVAudioSessionCategoryPlayAndRecord
-//                    mode: AVAudioSessionModeDefault
-//                    options: AVAudioSessionCategoryOptionAllowBluetoothA2DP | AVAudioSessionCategoryOptionAllowBluetooth
-//                    error:&error
-//                ];
-//                if(!success) NSLog(@"Error during session category set (init BT) %@", error);
-//            }
-                
             bool b = [ [self getAudioPlayer] play];
             return b;
         }
@@ -210,16 +177,75 @@
         int  m_numChannels;
 }
 
-       - (AudioEngine*)init: (FlautoPlayer*)owner eqParams: (NSDictionary*) params loudSpeakerOn: (bool) loudSpeakerOn
+       - (AudioEngine*)init: (FlautoPlayer*)owner eqParams: (NSDictionary*) params
        {
-            flutterSoundPlayer = owner;
-            waitingBlock = nil;
-            engine = [[AVAudioEngine alloc] init];
-            outputNode = [engine outputNode];
-            playerNode = [[AVAudioPlayerNode alloc] init];
-            
+           flutterSoundPlayer = owner;
+           waitingBlock = nil;
+           engine = [[AVAudioEngine alloc] init];
+           outputNode = [engine outputNode];
+           playerNode = [[AVAudioPlayerNode alloc] init];
+
+           // This fixes the audio output to the speaker (LAPSI fix)
+           NSError *error = nil;
+           bool success = false;
+           bool isLoudSpeakerOn = [flutterSoundPlayer isLoudSpeakerOn];
+           AVAudioSession *session = [AVAudioSession sharedInstance];
+
+           NSArray *categories = [[AVAudioSession sharedInstance] availableCategories];
+           NSLog(@"Available categories: %@", categories);
+
+           NSArray *modes = [[AVAudioSession sharedInstance] availableModes];
+           NSLog(@"Available modes: %@", modes);
+
+           AVAudioSessionCategoryOptions options = [[AVAudioSession sharedInstance] categoryOptions];
+           NSLog(@"Current option: %lu", (unsigned long)options);
+
+//           if (isLoudSpeakerOn && options != AVAudioSessionCategoryOptionDefaultToSpeaker){
+           if (isLoudSpeakerOn){
+               // Loudspeaker
+               NSLog(@"Setting loudspeaker on!");
+               success = [session
+                          setCategory: AVAudioSessionCategoryPlayAndRecord
+                          mode: AVAudioSessionModeDefault
+                          options:AVAudioSessionCategoryOptionDefaultToSpeaker
+                          //                       options: AVAudioSessionCategoryOptionAllowBluetoothA2DP | AVAudioSessionCategoryOptionAllowBluetooth
+                          error:&error
+               ];
+               if(!success) NSLog(@"SharedInstance set category failed during init: %@", error);
+
+               // Override to speaker
+               success = false;
+               success = [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
+
+               if(!success) NSLog(@"Speaker override failed: %@", error);
+
+//           } else if(!isLoudSpeakerOn && options != (AVAudioSessionCategoryOptionAllowBluetoothA2DP | AVAudioSessionCategoryOptionAllowBluetooth)) {
+           } else {
+               // Bluetooth/headset
+               NSLog(@"Setting BT/hedset on!");
+               success = [session
+                          setCategory: AVAudioSessionCategoryPlayAndRecord
+                          mode: AVAudioSessionModeDefault
+//                          options:AVAudioSessionCategoryOptionDefaultToSpeaker
+                          options: AVAudioSessionCategoryOptionAllowBluetoothA2DP | AVAudioSessionCategoryOptionAllowBluetooth
+                          error:&error
+               ];
+               if(!success) NSLog(@"SharedInstance set category failed during init: %@", error);
+
+               // Override to speaker
+               success = false;
+               success = [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error];
+
+               if(!success) NSLog(@"Speaker override failed: %@", error);
+           }
+//           else {
+//               NSLog(@"Skipping audio session setting because already set!");
+//           }
+
+           NSLog(@"Speaker setup done!");
+           
            // init speaker configs
-//           [self loudSpeakerOn:loudSpeakerOn];
+        //    [self loudSpeakerOn];
            
             if (@available(iOS 13.0, *)) {
                 if ([flutterSoundPlayer isVoiceProcessingEnabled]) {
@@ -432,7 +458,6 @@
 
         -(bool) play
         {
-            [self loudSpeakerOn:true];
             [playerNode play];
             return true;
 
@@ -553,81 +578,9 @@
                 return true; // TODO
         }
 
-        - (void) loudSpeakerOn:(bool) isLoudSpeaker
+        - (void) loudSpeakerOn
         {
-            
-            // This fixes the audio output to the speaker (LAPSI fix)
-            bool success;
-            NSError *error = nil;
-
-            AVAudioSession * session = [AVAudioSession sharedInstance];
-//            [session setActive:NO error:nil];
-            
-            bool isLoudSpeakerOn = [flutterSoundPlayer isLoudSpeakerOn];
-            NSLog(@"Is loudspeaker on: %s", isLoudSpeakerOn ? "YES":"NO");
-            
-            if (isLoudSpeakerOn){
-                success = [session
-                   setCategory: AVAudioSessionCategoryPlayAndRecord
-                   mode: AVAudioSessionModeDefault
-                   options: AVAudioSessionCategoryOptionDefaultToSpeaker
-                   error:&error
-                ];
-                if(!success) NSLog(@"Error during session category set (init SPEAKER) %@", error);
-                
-                // Override to speaker
-                success = false;
-                success = [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
-                if(!success) NSLog(@"Error override (SPEAKER): %@", error);
-            } else {
-                //Bluetooth
-                success = [session
-                    setCategory: AVAudioSessionCategoryPlayAndRecord
-                    mode: AVAudioSessionModeDefault
-                    options: AVAudioSessionCategoryOptionAllowBluetoothA2DP | AVAudioSessionCategoryOptionAllowBluetooth
-                    error:&error
-                ];
-//                success = [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error];
-                if(!success) NSLog(@"Error during session category set (init BT) %@", error);
-            }
-//            [session setActive:YES error:nil];
-            
-//            NSLog(@"loudSpeakerOn: %s", isLoudSpeaker ? "TRUE": "FALSE");
-//
-//            AVAudioSession * session = [AVAudioSession sharedInstance];
-//
-//            [session setActive:NO error:nil];
-//
-//            BOOL success;
-//            NSError* error;
-//
-//            if (isLoudSpeaker){
-//                //Speaker
-//                success = [session
-//                    setCategory: AVAudioSessionCategoryPlayAndRecord
-//                    mode: AVAudioSessionModeDefault
-//                    options: AVAudioSessionCategoryOptionDefaultToSpeaker
-//                    error:&error
-//                ];
-//            } else {
-//                //Bluetooth
-//                success = [session
-//                    setCategory: AVAudioSessionCategoryPlayAndRecord
-//                    mode: AVAudioSessionModeDefault
-//                    options: AVAudioSessionCategoryOptionAllowBluetoothA2DP | AVAudioSessionCategoryOptionAllowBluetooth
-//                    error:&error
-//                ];
-//            }
-//            if(!success) NSLog(@"AVAudioSession error setting category:%@",error);
-//
-//            //Override audio port
-//            success = [session overrideOutputAudioPort : isLoudSpeaker ?
-//                     AVAudioSessionPortOverrideSpeaker : AVAudioSessionPortOverrideNone
-//                                                  error: & error];
-//
-//            if(!success) NSLog(@"AVAudioSession error setting :%@",error);
-//
-//            [session setActive:YES error:nil];
+            //
         }
 
         - (float) gainFrom:(float) value

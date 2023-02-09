@@ -191,7 +191,7 @@ static bool _isIosDecoderSupported [] =
         [self stop]; // To start a fresh new playback
 
         if ( (path == nil ||  [path class] == [NSNull class] ) && codec == pcm16)
-                m_playerEngine = [[AudioEngine alloc] init: self eqParams: equalizerParams loudSpeakerOn: loudspeakerIsOn ];
+                m_playerEngine = [[AudioEngine alloc] init: self eqParams: equalizerParams];
         else
                 m_playerEngine = [[AudioPlayerFlauto alloc]init: self];
         
@@ -499,7 +499,6 @@ static bool _isIosDecoderSupported [] =
 - (void) setLoudSpeakerOn: (bool) isLoudSpeaker
 {
     loudspeakerIsOn = (bool)isLoudSpeaker;
-//    [m_playerEngine loudSpeakerOn: isLoudSpeaker];
 }
 
 
