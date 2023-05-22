@@ -61,7 +61,7 @@ android {
         minSdkVersion 18
         targetSdkVersion 30
         versionCode 19213
-        versionName '9.2.13'
+        versionName '9.2.14'
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
