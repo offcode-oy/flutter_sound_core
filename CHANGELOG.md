@@ -1,5 +1,9 @@
-## 9.2.13
+## 9.2.14
 
-- ## The [CHANGELOG file is here](https://flutter-sound.canardoux.xyz/changelog.html)
+-   ## This is OFFCODE version meant to be used with bluetooth_connectivity_sdk
 
------------------------------------------------------------------------------------------------------------------------------------
+### Added:
+
+-   Fixes for iOS audio streaming
+
+---
