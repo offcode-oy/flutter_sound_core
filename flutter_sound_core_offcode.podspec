@@ -1,5 +1,5 @@
 #
-# Be sure to run `pod lib lint flutter_engine.podspec' to ensure this is a
+# Be sure to run `pod lib lint flutter_sound_core_offcode.podspec' to ensure this is a
 # valid spec before submitting.
 #
 # Any lines starting with a # are optional, but their use is encouraged
@@ -7,7 +7,7 @@
 #
 
 Pod::Spec.new do |s|
-  s.name             = 'flutter_sound_core'
+  s.name             = 'flutter_sound_core_offcode'
   s.version          = '9.2.14'
   s.summary          = 'Provides simple recorder and player functionalities for iOS platform.'
 
@@ -25,8 +25,8 @@ It has been extracted to be isolated from Flutter and can be used with other fra
 
   s.homepage         = 'https://github.com/canardoux/flutter_sound'
   s.license          = { :type => 'MPL2', :file => 'LICENSE' }
-  s.author           = { 'larpoux' => 'larpoux@gmail.com' }
-  s.source           = { :git => 'https://github.com/canardoux/flutter_sound_core.git', :tag => '' + s.version.to_s }
+  s.author           = { 'toni.karhu' => 'toni.karhu@offcode.fi' }
+  s.source           = { :git => 'https://github.com/offcode-oy/flutter_sound_core.git', :tag => '' + s.version.to_s }
 
   s.ios.deployment_target = '10.0'
 
