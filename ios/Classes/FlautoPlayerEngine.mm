@@ -171,11 +171,13 @@
         NSData* waitingBlock;
         long m_sampleRate ;
         int  m_numChannels;
+        t_CODEC m_codec;
 }
 
-       - (AudioEngine*)init: (FlautoPlayer*)owner
+       - (AudioEngine*)init: (FlautoPlayer*)owner codec:(t_CODEC)codec
        {
                 flutterSoundPlayer = owner;
+                m_codec = codec;
                 waitingBlock = nil;
                 engine = [[AVAudioEngine alloc] init];
                 outputNode = [engine outputNode];
@@ -308,19 +310,23 @@
                 if (ready < NB_BUFFERS )
                 {
                         int ln = (int)[data length];
-                        int frameLn = ln/4;
-                        int frameLength =  frameLn;// Two octets for a frame (Monophony, INT Linear 16)
+                        int frameLn;
+                        if (m_codec == pcm16) frameLn = ln / 4;
+                        if (m_codec == pcmFloat32) frameLn = ln / 8;
 
                         AVAudioChannelLayout *chLayout = [[AVAudioChannelLayout alloc] initWithLayoutTag:kAudioChannelLayoutTag_Stereo];
+                        AVAudioCommonFormat pcmFormat;
+                        if (m_codec == pcm16) pcmFormat = AVAudioPCMFormatInt16;
+                        if (m_codec == pcmFloat32) pcmFormat = AVAudioPCMFormatFloat32;
                         playerFormat = [[AVAudioFormat alloc] 
-                                initWithCommonFormat: AVAudioPCMFormatInt16
+                                initWithCommonFormat: pcmFormat
                                 sampleRate: (double)m_sampleRate
                                 // channels: m_numChannels
                                 interleaved: YES
                                 channelLayout: chLayout];
-
                         AVAudioPCMBuffer* thePCMInputBuffer =  [[AVAudioPCMBuffer alloc] initWithPCMFormat: playerFormat frameCapacity: frameLn];
-                        memcpy((unsigned char*)(thePCMInputBuffer.int16ChannelData[0]), [data bytes], ln);
+                        if (m_codec == pcm16) memcpy((unsigned char*)(thePCMInputBuffer.int16ChannelData[0]), [data bytes], ln);
+                        if (m_codec == pcmFloat32) memcpy((unsigned char*)(thePCMInputBuffer.floatChannelData[0]), [data bytes], ln);
                         thePCMInputBuffer.frameLength = frameLn;
                         static bool hasData = true;
                         hasData = true;
@@ -331,7 +337,7 @@
                                 return thePCMInputBuffer;
                         };
 
-                        AVAudioPCMBuffer* thePCMOutputBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat: outputFormat frameCapacity: frameLength];
+                        AVAudioPCMBuffer* thePCMOutputBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat: outputFormat frameCapacity: frameLn];
                         thePCMOutputBuffer.frameLength = 0;
 
                         if (converter == nil) 
