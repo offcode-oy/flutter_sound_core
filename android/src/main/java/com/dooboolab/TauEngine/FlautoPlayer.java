@@ -198,9 +198,9 @@ public class FlautoPlayer  implements MediaPlayer.OnErrorListener
 
 		try
 		{
-			if (fromURI == null && codec == t_CODEC.pcm16)
+			if (fromURI == null && (codec == t_CODEC.pcm16 || codec == t_CODEC.pcmFloat32))
 			{
-				player = new FlautoPlayerEngine();
+				player = new FlautoPlayerEngine(codec);
 			} else
 			{
 				player = new FlautoPlayerMedia(this);

@@ -42,6 +42,7 @@ class FlautoPlayerEngine extends FlautoPlayerEngineInterface
 	long systemTime = 0;
 	WriteBlockThread blockThread = null;
 	FlautoPlayer mSession = null;
+	t_CODEC m_codec;
 
 	class WriteBlockThread extends Thread
 	{
@@ -83,8 +84,9 @@ class FlautoPlayerEngine extends FlautoPlayerEngineInterface
 		}
 	}
 
-	/* ctor */ FlautoPlayerEngine() throws Exception
+	/* ctor */ FlautoPlayerEngine(t_CODEC codec) throws Exception
 	{
+		m_codec = codec;
 		if ( Build.VERSION.SDK_INT >= 21 )
 		{
 
@@ -115,8 +117,11 @@ class FlautoPlayerEngine extends FlautoPlayerEngineInterface
 				.setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
 				.build();
 
+			int encodingPCM;
+			if (codec == t_CODEC.pcm16) encodingPCM = AudioFormat.ENCODING_PCM_16BIT;
+			if (codec == t_CODEC.pcmFloat32) encodingPCM = AudioFormat.ENCODING_PCM_FLOAT;
 			AudioFormat format = new AudioFormat.Builder()
-				.setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+				.setEncoding(encodingPCM)
 				.setSampleRate(sampleRate)
 				.setChannelMask(numChannels == 1 ? AudioFormat.CHANNEL_OUT_MONO : AudioFormat.CHANNEL_OUT_STEREO)
 				.build();
