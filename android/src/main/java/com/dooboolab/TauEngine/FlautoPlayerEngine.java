@@ -32,6 +32,8 @@ import java.lang.Thread;
 //-------------------------------------------------------------------------------------------------------------
 
 
+import com.dooboolab.TauEngine.Flauto.*;
+
 
 class FlautoPlayerEngine extends FlautoPlayerEngineInterface
 {
@@ -117,9 +119,9 @@ class FlautoPlayerEngine extends FlautoPlayerEngineInterface
 				.setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
 				.build();
 
-			int encodingPCM;
-			if (codec == t_CODEC.pcm16) encodingPCM = AudioFormat.ENCODING_PCM_16BIT;
-			if (codec == t_CODEC.pcmFloat32) encodingPCM = AudioFormat.ENCODING_PCM_FLOAT;
+			int encodingPCM = AudioFormat.ENCODING_PCM_16BIT;
+			if (m_codec == t_CODEC.pcm16) encodingPCM = AudioFormat.ENCODING_PCM_16BIT; // for clarity
+			if (m_codec == t_CODEC.pcmFloat32) encodingPCM = AudioFormat.ENCODING_PCM_FLOAT;
 			AudioFormat format = new AudioFormat.Builder()
 				.setEncoding(encodingPCM)
 				.setSampleRate(sampleRate)
