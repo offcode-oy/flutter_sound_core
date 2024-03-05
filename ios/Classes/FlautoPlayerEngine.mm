@@ -174,8 +174,7 @@
         int  m_numChannels; // 2
         int64_t m_inBuffer; // number of feed() blocks of data in the audio buffer
 }
-
-       - (AudioEngine*)init: (FlautoPlayer*)owner
+       - (AudioEngine*)init: (FlautoPlayer*)owner codec:(t_CODEC)codec
        {
                 flutterSoundPlayer = owner;
                 engine = [[AVAudioEngine alloc] init];
